@@ -8,15 +8,12 @@ const token = process.env.OPENAI_API_KEY;
 const configuration = new Configuration({apiKey: token});
 const openai = new OpenAIApi(configuration);
 
-// given big chunk of text, call gpt to summarize main points & store as an array if there's not already one there
 router.post('/', (req, res) => {
-    const body = req.body;
-    console.log(body);
-    const toSend = "Here is the text that I will reference: '"+body+"'";
+    // console.log(req.body.prompt);
     const response = openai.createCompletion({
         model: 'text-davinci-003',
-        prompt: toSend.prompt
-    })
+        prompt: req.body.prompt
+    });
 
     response.then((data) => {
         res.send({message: data.data.choices[0].text});
