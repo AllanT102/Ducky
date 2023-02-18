@@ -7,7 +7,7 @@ const uri = "mongodb+srv://aksarabayyapu:tuU9QKhnEMmKQk7x@mymongodb.8lq7t4k.mong
 const client = new MongoClient(uri);
 
 async function createListing(client, newListing){
-  const result = await client.db("sample_airbnb").collection("listingsAndReviews").insertOne(newListing);
+  const result = await client.db("DuckyDB").collection("DuckyCo").insertOne(newListing);
   console.log(`New listing created with the following id: ${result.insertedId}`);
 }
 
@@ -22,10 +22,9 @@ async function run() {
 
     await createListing(client,
       {
-          name: "Lovely Loft",
-          summary: "A charming loft in Paris",
-          bedrooms: 1,
-          bathrooms: 1
+          text: "raw information",
+          keyElemArray: [],
+          numOfElements: 0
       }
     );
 
