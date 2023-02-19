@@ -11,6 +11,9 @@ app.use('/message', gptRouter);
 const storeRouter = require('./routes/store.js');
 app.use('/store', storeRouter);
 
+const pdfRouter = require('./routes/pdfToTextRoute');
+app.use('/pdfToText', pdfRouter);
+
 app.listen(3001, () => {
   console.log('app is listening on port 3001')
 })
