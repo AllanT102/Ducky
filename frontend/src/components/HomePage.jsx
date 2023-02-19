@@ -5,8 +5,15 @@ import "../styles/homepage.css";
 import mic from "../assets/mic.png"
 import MicIcon from '@mui/icons-material/Mic';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
+    const navigate = useNavigate();
+
+    const routeChange = () =>{ 
+        let path = `/chatPage`; 
+        navigate(path);
+      }
 
     return (
         <Box
@@ -18,7 +25,7 @@ const HomePage = () => {
             height: "100vh",
             flexDirection: "column"
         }}>
-            <div style={{ paddingTop: "5%", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                     <p className="gradient">Active Recall with Ducky</p>
                 </div>
@@ -35,7 +42,7 @@ const HomePage = () => {
                         marginTop: "10px",
                         fontFamily: `'Josefin Sans', sans-serif`,
                         textTransform: "none", 
-                    }}>Try now</Button>
+                    }} onClick={routeChange}>Try now</Button>
                 </div>
             </div>
             <Box sx={{
@@ -45,7 +52,7 @@ const HomePage = () => {
                 width: "100vw",
                 gap: "5%"
             }}>
-                <Box sx={{
+                {/* <Box sx={{
                     border: "solid black 3px",
                     width: "400px",
                     height: "200px",
@@ -64,7 +71,7 @@ const HomePage = () => {
                         <MicIcon sx={{ marginTop: "10px" }}></MicIcon>
                     </div>
                 </Box>
-                <p></p>
+                <p></p> */}
                 <img src={ducky} alt="ducky" style={{ borderRadius: "50%", width: "400px", height: "400px" }}></img>
             </Box>
         </Box>

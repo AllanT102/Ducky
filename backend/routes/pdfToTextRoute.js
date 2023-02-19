@@ -15,7 +15,6 @@ router.post('/', upload.single('pdf'), async (req, res) => {
   
     const pdfFile = req.file;
     const path = pdfFile.path
-    console.log(pdfFile);
 
     let dataBuffer = fs.readFileSync(path);
     const text =  await pdf(dataBuffer);

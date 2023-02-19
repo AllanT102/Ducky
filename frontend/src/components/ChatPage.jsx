@@ -8,17 +8,25 @@ import axios from 'axios';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 import StopIcon from '@mui/icons-material/Stop';
 import ducky from "../assets/ducky1.png";
-import allan from "../assets/allan.jpg";
+import team from "../assets/team.png";
+import { useNavigate } from "react-router-dom";
 
 
 const ChatPage = () => {
-    const [allMessages, setAllMessages] = useState([{user: false, message: "Hi! I have compiled your notes, that's some seriously interesting stuff. Let's start studying, ask or tell me anything!" }, {user: true, message: "hello world 123"}, {user: true, message: "hello world 123"}, {user: false, message: "hello world 123"}, {user: true, message: "hello world 123"}, {user: false, message: "hello world 123"}, {user: true, message: "hello world 123"}, {user: true, message: "hello world 123"}, {user: true, message: "hello world 123"}, {user: false, message: "hello world 123"}, {user: true, message: "hello world 123"}, {user: false, message: "hello world 123"}]);
+    const [allMessages, setAllMessages] = useState([{user: false, message: "Hi! I have compiled your notes, that's some seriously interesting stuff. Let's start studying, ask or tell me anything!" }]);
     const [userMessages, setUserMessages] = useState([]);
     const [userInputText, setUserInputText] = useState("");
     const [fileUploaded, setFileUploaded] = useState(false);
     const [pdfFile, setPdfFile] = useState(null);
     const [doneLoading, setDoneLoading] = useState(false);
     const [isUserTurn, setIsUserTurn] = useState(true);
+    const navigate = useNavigate();
+
+    const routeChange = () =>{ 
+        let path = `/`; 
+        navigate(path);
+      }
+
     
     const {
       transcript,
@@ -26,6 +34,10 @@ const ChatPage = () => {
       resetTranscript,
       browserSupportsSpeechRecognition
     } = useSpeechRecognition();
+
+    useEffect(() => {
+        console.log(allMessages);
+    }, [allMessages])
     
     // const Microphone = () => {
       
@@ -66,7 +78,7 @@ const ChatPage = () => {
             user ? 
             <Typography sx={{ textAlign: "right", backgroundColor: "white", mb: 2.5, p: 2, borderRadius: '8px', boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px", display: 'flex', justifyContent: "flex-end", alignItems: "center", gap: "10px"}} key={idx}>
                 {message} 
-                <Avatar alt="ducky" src={allan} sx={{
+                <Avatar alt="ducky" src={team} sx={{
                     width: "30px",
                     height: "30px",
                 }} />
@@ -106,20 +118,24 @@ const ChatPage = () => {
         .then(res => {
             setUserInputText(res.data.text);
             storeUserInput(res.data.text);
+            console.log(res.data.text);
         })
-        .catch(err => console.log('err'));
+        .catch(err => console.log(err));
     }   
-    
-    const triggerDuckyResponse = async (msg) => {
+        
+    const triggerDuckyResponse = async (msg, toAdd) => {
         console.log('ducky resonse triggered')
-        await axios.post('http://localhost:3001/message', { newMessage: msg}, {
+        axios.post('http://localhost:3001/message', { newMessage: msg }, {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                'Content-Type': 'application/json'
             }
-        }).then(res => console.log(res));
+        }).then(res => {
+            setAllMessages([...allMessages, toAdd, { user: false, message: res.data.message}]);
+            resetTranscript();
+        });
     }
 
-    const handlePlay = () => {
+    const handlePlay = (event) => {
         SpeechRecognition.startListening();
         setIsUserTurn(true);
         console.log('hello');
@@ -127,12 +143,10 @@ const ChatPage = () => {
 
     const handleStop = async () => {
         SpeechRecognition.stopListening();
-        setUserMessages([transcript, ...userMessages])
-        setAllMessages([...allMessages, { user: true, message: transcript }]);
-        resetTranscript();
         setIsUserTurn(false);
-        console.log('stopped');
-        await triggerDuckyResponse(userMessages[0]);
+        setAllMessages([...allMessages, { user: true, message: transcript }]);
+        await triggerDuckyResponse(transcript, { user: true, message: transcript });
+        // await triggerDuckyResponse("hello");
     }
     
     return (
@@ -195,8 +209,8 @@ const ChatPage = () => {
                             justifyContent: "center",
                             alignItems: "center",
                             gap: "20px"
-                        }}>
-                            <MicIcon onClick={handlePlay} sx={{ cursor: "pointer" }}></MicIcon>
+                        }}> 
+                            <MicIcon onClick={handlePlay} sx={{ cursor: "pointer" }}></MicIcon> 
                             <StopIcon onClick={handleStop} sx={{ cursor: "pointer" }}></StopIcon>
                             {/* <Microphone></Microphone> */}
                         </Box>
@@ -204,10 +218,10 @@ const ChatPage = () => {
                     }   
                 </Box>
                 {
-                    doneLoading && <Avatar alt="ducky" src={allan} sx={{
+                    doneLoading && <Avatar alt="ducky" src={team} sx={{
                         width: "100px",
-                        height: "100px",
-                    }}></Avatar>
+                        height: "100px"
+                    }}></Avatar> 
                 }
             </Box>
             {
@@ -222,7 +236,7 @@ const ChatPage = () => {
                         marginTop: "10px",
                         fontFamily: `'Josefin Sans', sans-serif`,
                         textTransform: "none", 
-                 }}>Go home</Button>
+                 }} onClick={routeChange}>Go home</Button>
             }
         </Box>
     )
