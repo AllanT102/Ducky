@@ -14,9 +14,11 @@ const openai = new OpenAIApi(configuration);
  // router???? wtf is this
 
 router.post('/', (req, res) => {
+    const toSend = "Here is the text that I will reference: '"+req.body.prompt+"'";
+    console.log(toSend);
     const response = openai.createCompletion({
         model: 'text-davinci-003',
-        prompt: req.body.prompt
+        prompt: toSend
     })
 
     response.then((data) => {
