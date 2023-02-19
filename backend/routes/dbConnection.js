@@ -46,7 +46,7 @@ router.get('/', async (req, res) => {
   // console.log(req.body);
     const response = client.db("DuckyDB").collection("DuckyCo").find()
     const array = await response.toArray()
-    res.send({message: array })
+    res.send({ message: array })
     //response.then(() => res.send({message:response}))
 });
 

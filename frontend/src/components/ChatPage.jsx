@@ -60,6 +60,7 @@ const ChatPage = () => {
         multiple: false
     });
 
+    
     const message = ({ user, message }, idx) => {
         return (
             user ? 
@@ -70,16 +71,29 @@ const ChatPage = () => {
                     height: "30px",
                 }} />
             </Typography> : 
-            <Typography sx={{ backgroundColor: "#CAD5E2", mb: 2.5, p: 2, borderRadius: '8px', boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px", display: 'flex', justifyContent: "flex-end", alignItems: "center", gap: "10px" }} key={idx}>
+            <Typography sx={{ textAlign: "left", backgroundColor: "#CAD5E2", mb: 2.5, p: 2, borderRadius: '8px', boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px", display: 'flex', justifyContent: "flex-start", alignItems: "center", gap: "10px" }} key={idx}>
                 <Avatar alt="ducky" src={ducky} sx={{
-                width: "30px",
-                height: "30px",
+                    width: "30px",
+                    height: "30px",
                 }}/>
                 {message}
             </Typography>
         )
     }
+    
+    // api calls
 
+    const storeUserInput = async (text) => {
+        axios.post('http://localhost:3001/store', { prompt: text }, {
+            Headers: {
+                'Content-Type': "application/json"
+            }
+        }).then(res => {
+            setDoneLoading(true);
+            console.log('userdata has been stored');
+        })
+    }
+    
     const handleSubmitPdf = async () => {
         console.log('entered handle submit')
         const formData = new FormData();
@@ -91,10 +105,19 @@ const ChatPage = () => {
         })
         .then(res => {
             setUserInputText(res.data.text);
-            setDoneLoading(true);
+            storeUserInput(res.data.text);
         })
         .catch(err => console.log('err'));
     }   
+    
+    const triggerDuckyResponse = async (msg) => {
+        console.log('ducky resonse triggered')
+        await axios.post('http://localhost:3001/message', { newMessage: msg}, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }).then(res => console.log(res));
+    }
 
     const handlePlay = () => {
         SpeechRecognition.startListening();
@@ -102,13 +125,14 @@ const ChatPage = () => {
         console.log('hello');
     }
 
-    const handleStop = () => {
+    const handleStop = async () => {
         SpeechRecognition.stopListening();
         setUserMessages([transcript, ...userMessages])
         setAllMessages([...allMessages, { user: true, message: transcript }]);
-        SpeechRecognition.resetTranscript();
+        resetTranscript();
         setIsUserTurn(false);
         console.log('stopped');
+        await triggerDuckyResponse(userMessages[0]);
     }
     
     return (
@@ -146,8 +170,8 @@ const ChatPage = () => {
                                 !fileUploaded && <p>Drop the files here ...</p> :
                                 !fileUploaded && <Box sx={{ display: "flex", justifyContent:"center", alignItems:"center"}}><FileUploadIcon fontSize="large"></FileUploadIcon><Typography>Upload PDF</Typography></Box>
                             }
-                            {pdfFile && (
-                                <CircularProgress sx={{ color: "#f7c313" }}/>
+                            {!doneLoading && (
+                                 pdfFile && <CircularProgress sx={{ color: "#f7c313" }}/>
                             )}
                         </div>
                     </Box>
